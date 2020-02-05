@@ -1,0 +1,77 @@
+# Evaluated-Health-Status-of-the-employees
+Evaluate employee's health status with data visualization tools in Python, then conducted data analytics based on data visualization work.
+/* Generated Code (IMPORT) */
+/* Source File: health_data.xlsx */
+/* Source Path: /folders/myfolders/sasuser.v94 */
+/* Code generated on: 2/4/20, 7:39 PM */
+
+%web_drop_table(WORK.IMPORT1);
+
+
+FILENAME REFFILE '/folders/myfolders/sasuser.v94/health_data.xlsx';
+
+PROC IMPORT DATAFILE=REFFILE
+	DBMS=XLSX
+	OUT=WORK.IMPORT1;
+	GETNAMES=YES;
+RUN;
+
+PROC CONTENTS DATA=WORK.IMPORT1; RUN;
+
+
+%web_open_table(WORK.IMPORT1);
+
+proc means data= work.import1;
+var age salary health_score;
+run;
+
+proc sort data= work.import1;
+by employee_id quarter;
+run;
+
+*pooled OLS estimator;
+proc reg data= work.import1;
+model health_score = age salary;
+run;
+
+*pooled OLS estimator;
+proc panel data=work.import1;
+id employee_id t;
+model health_score = age salary /POOLED;
+run;
+
+*Between group estimator;
+proc panel data=work.import1;
+id employee_id t;
+model health_score = age salary /BTWNG;
+run;
+
+*Fixed effects or within estimator;
+proc panel data=work.import1;
+id employee_id t;
+model health_score = age salary /FIXONE;
+run;
+
+*Fixed effects or within estimator;
+proc TSCSREG data=work.import1;
+id employee_id t;
+model health_score = age salary /FIXONE;
+run;
+
+*Random effects estimator;
+proc tscsreg data= work.import1;
+id employee_id t;
+model health_score = age salary /RANONE;
+run;
+
+*Random effects estimator;
+proc panel data= work.import1;
+id employee_id t;
+model health_score = age salary /RANONE;
+run;
+
+*Random effects estimator with Breusch-Pagan LM test;
+proc panel data=work.import1;
+id employee_id t;
+model health_score = age salary /RANONE BP;
+run;
